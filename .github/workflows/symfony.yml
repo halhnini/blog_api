@@ -8,7 +8,6 @@ on:
         - develop
         - 'release/**'
 
-
 env:
   SCRUTINIZER_TOKEN: ${{ secrets.SCRUTINIZER_TOKEN }}
 
