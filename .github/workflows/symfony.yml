@@ -1,0 +1,79 @@
+name: Symfony CI
+
+on:
+  pull_request: ~
+    push:
+      branches:
+        - master
+        - develop
+        - 'release/**'
+
+
+env:
+  SCRUTINIZER_TOKEN: ${{ secrets.SCRUTINIZER_TOKEN }}
+
+jobs:
+  build-symfony:
+    name: Build Symfony
+
+    runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: false
+      matrix:
+        php-version: [7.4]
+
+    container:
+      image: 'blogapi/php-ci:${{ matrix.php-version }}'
+      env:
+        SYMFONY_PHPUNIT_VERSION: 8.3
+
+    services:
+      mmysql:
+        image: mysql:5.7
+        env:
+          MYSQL_DATABASE: test_db
+          MYSQL_USER: user
+          MYSQL_PASSWORD: password
+          MYSQL_ROOT_PASSWORD: rootpassword
+        ports:
+          - 33306:3306
+        options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
+
+      rabbitmq:
+        image: rabbitmq:3.6-alpine
+
+
+    steps:
+      - uses: actions/checkout@v2
+        if: github.event_name == 'pull_request'
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+
+      - uses: actions/checkout@v2
+        if: github.event_name != 'pull_request'
+
+      - name: Build
+          run: |
+            composer install -q -o -n --no-suggest --no-progress --prefer-dist --no-ansi
+            # database
+            bin/console doctrine:migration:migrate -n --allow-no-migration -e test
+            bin/console doctrine:fixtures:load -e test -n
+
+            - name: Doctrine schema validate
+              run: bin/console doctrine:schema:validate -e test
+
+            - name: Security check
+              run: bin/console security:check -e test
+
+            - name: Yaml validate
+              run: bin/console lint:yaml config/ --parse-tags -e test
+
+            - name: Testsuite with coverage
+              run: bin/phpunit --coverage-clover=coverage.clover tests/
+              if: ${{ matrix.php-version == 7.4 }}
+
+            - name: Testsuite without coverage
+              run: bin/phpunit tests/
+              if: ${{ matrix.php-version != 7.4 }}
+      
