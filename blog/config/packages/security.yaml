@@ -1,0 +1,57 @@
+security:
+    role_hierarchy:
+        ROLE_SUBSCRIBER: ['ROLE_USER']
+        ROLE_CONTRIBUTOR: ['ROLE_USER']
+        ROLE_EDITOR: ['ROLE_USER']
+        ROLE_AUTHOR: ['ROLE_USER']
+        ROLE_ADMIN: ['ROLE_USER']
+        ROLE_SUPER_ADMIN: ['ROLE_ADMIN']
+        ROLE_IT: ['ROLE_AUTHOR', 'ROLE_EDITOR', 'ROLE_CONTRIBUTOR', 'ROLE_SUBSCRIBER', 'ROLE_SUPER_ADMIN', 'ROLE_BASIC_USER']
+
+    encoders:
+        App\Entity\User: bcrypt
+
+    providers:
+        users_in_memory: { memory: null }
+        jwt_users:
+            entity:
+                class: App\Entity\User
+                property: email
+        basic_users:
+            entity:
+                class: App\Entity\User
+                property: email
+
+    firewalls:
+        dev:
+            pattern: ^/(_(profiler|wdt)|css|images|js)/
+            security: false
+        api_doc:
+            pattern: ^/doc$
+            security: false
+        public:
+            pattern: ^/api/public
+            stateless: true
+            anonymous: true
+            http_basic:
+                realm: "Public Api Area"
+                provider: basic_users
+            user_checker: App\Security\Checker\UserChecker
+        private:
+            pattern: ^/api/private
+            stateless: true
+            anonymous: true
+            provider: jwt_users
+            user_checker: App\Security\Checker\UserChecker
+            json_login:
+                check_path: /api/private/get-token
+                success_handler: lexik_jwt_authentication.handler.authentication_success
+                failure_handler: lexik_jwt_authentication.handler.authentication_failure
+            guard:
+                authenticators:
+                    - lexik_jwt_authentication.jwt_token_authenticator
+
+    access_control:
+        - { path: ^/api/private/get-token$, roles: IS_AUTHENTICATED_ANONYMOUSLY }
+        - { path: ^/api/private/refresh-token$, roles: IS_AUTHENTICATED_ANONYMOUSLY }
+        - { path: ^/api/private, roles: IS_AUTHENTICATED_FULLY }

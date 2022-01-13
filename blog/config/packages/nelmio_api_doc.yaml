@@ -1,0 +1,23 @@
+nelmio_api_doc:
+    documentation:
+        openapi: 3.0.0
+        info:
+            title: Blog API
+            description: Blog API.
+            version: 1.0.0
+        components:
+            securitySchemes:
+                Bearer:
+                    type: http
+                    scheme: bearer
+                    bearerFormat: JWT
+                Basic:
+                    type: http
+                    scheme: basic
+        security:
+            - Bearer: []
+            - Basic: []
+    areas:
+        default:
+            path_patterns: [^/api/public, ^/api/private]
+

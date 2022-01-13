@@ -1,0 +1,18 @@
+swagger_ui_json:
+    path: /doc.json
+    methods: GET
+    defaults: { _controller: nelmio_api_doc.controller.swagger }
+
+swagger_ui:
+    path: /doc/{area}
+    methods: GET
+    defaults: { _controller: nelmio_api_doc.controller.swagger_ui, area: default }
+
+index:
+    path: /
+    methods: GET
+    controller: Symfony\Bundle\FrameworkBundle\Controller\RedirectController::redirectAction
+    defaults:
+        route: swagger_ui
+        permanent: false
+        keepQueryParams: true

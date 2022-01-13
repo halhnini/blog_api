@@ -1,0 +1,7 @@
+gesdinet_jwt_refresh_token:
+    ttl: 86400
+    ttl_update: true
+    token_parameter_name: refreshToken
+    firewall: private
+    user_checker: App\Security\Checker\UserChecker
+    single_use: true

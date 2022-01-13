@@ -1,0 +1,8 @@
+jwt_get_token:
+  path: /api/private/get-token
+  methods: [POST]
+
+gesdinet_jwt_refresh_token:
+  path: /api/private/refresh-token
+  controller: gesdinet.jwtrefreshtoken::refresh
+  methods: [POST]

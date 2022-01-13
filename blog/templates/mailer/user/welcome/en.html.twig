@@ -1,0 +1,13 @@
+{%  extends '@mailer/base/en.html.twig' %}
+
+{% block mail_body %}
+    <p style="font-weight: bold">
+        You're almost there!
+    </p>
+    <p>
+        The entire Blog team is happy to count you among these users. Simply complete your profile by clicking on the button below.
+    </p>
+    <p>
+        <a href="{{ blogUrl ~ '/profile' }}" target="_blank" style="display: inline-block; color: #ffffff; background-color: #3498db; border: solid 1px #3498db; border-radius: 5px; box-sizing: border-box; cursor: pointer; text-decoration: none; font-size: 14px; font-weight: bold; margin: 0; padding: 12px 25px; text-transform: capitalize; border-color: #3498db;">Access to my profile</a>
+    </p>
+{% endblock %}

@@ -1,0 +1,17 @@
+# Read the documentation: https://symfony.com/doc/master/bundles/FOSRestBundle/index.html
+fos_rest:
+  param_fetcher_listener:  true
+  allowed_methods_listener:  true
+  body_listener:
+    array_normalizer: fos_rest.normalizer.camel_keys
+  view:
+    serialize_null: true
+    view_response_listener:  true
+  serializer:
+    serialize_null: false
+  format_listener:
+    rules:
+      - { path: "^/doc$", stop: true}
+      - { path: "^/api/*", prefer_extension: true, fallback_format: json, priorities: [ json ] }
+      - { path: "^/*", stop: true}
+  versioning: true
